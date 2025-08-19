@@ -3472,16 +3472,16 @@ int rdbLoadRioWithLoadingCtx(rio *rdb, int rdbflags, rdbSaveInfo *rsi, rdbLoadin
             } else if (!strcasecmp(auxkey->ptr,"lua")) {
                 /* Won't load the script back in memory anymore. */
             } else if (!strcasecmp(auxkey->ptr,"redis-ver")) {
-                serverLog(LL_NOTICE,"Loading RDB produced by version %s",
+                serverLog(LL_NOTICE,"加载旧缓存数据 %s",
                     (char*)auxval->ptr);
             } else if (!strcasecmp(auxkey->ptr,"ctime")) {
                 time_t age = time(NULL)-strtol(auxval->ptr,NULL,10);
                 if (age < 0) age = 0;
-                serverLog(LL_NOTICE,"RDB age %ld seconds",
+                serverLog(LL_NOTICE,"RDB读取数据已使用时间 %ld 秒",
                     (unsigned long) age);
             } else if (!strcasecmp(auxkey->ptr,"used-mem")) {
                 long long usedmem = strtoll(auxval->ptr,NULL,10);
-                serverLog(LL_NOTICE,"RDB memory usage when created %.2f Mb",
+                serverLog(LL_NOTICE,"创建时RDB内存使用量 %.2f Mb",
                     (double) usedmem / (1024*1024));
                 server.loading_rdb_used_mem = usedmem;
             } else if (!strcasecmp(auxkey->ptr,"aof-preamble")) {
@@ -3695,11 +3695,11 @@ int rdbLoadRioWithLoadingCtx(rio *rdb, int rdbflags, rdbSaveInfo *rsi, rdbLoadin
 
     if (empty_keys_skipped) {
         serverLog(LL_NOTICE,
-            "Done loading RDB, keys loaded: %lld, keys expired: %lld, empty keys skipped: %lld.",
+            "结束初始化旧缓存，当前key数量: %lld, 已过期数量: %lld, 空key数量（已跳过）: %lld.",
                 server.rdb_last_load_keys_loaded, server.rdb_last_load_keys_expired, empty_keys_skipped);
     } else {
         serverLog(LL_NOTICE,
-            "Done loading RDB, keys loaded: %lld, keys expired: %lld.",
+            "结束初始化旧缓存，当前key数量: %lld, 已过期数量: %lld.",
                 server.rdb_last_load_keys_loaded, server.rdb_last_load_keys_expired);
     }
     return C_OK;

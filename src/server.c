@@ -2529,17 +2529,15 @@ void adjustOpenFilesLimit(void) {
                         (unsigned long long) maxfiles);
                     exit(1);
                 }
-                serverLog(LL_WARNING,"You requested maxclients of %d "
-                    "requiring at least %llu max file descriptors.",
+                serverLog(LL_WARNING,"您请求的最大客户端数为 %d "
+                    "需要至少 %llu 个最大文件描述符",
                     old_maxclients,
                     (unsigned long long) maxfiles);
-                serverLog(LL_WARNING,"Server can't set maximum open files "
-                    "to %llu because of OS error: %s.",
+                serverLog(LL_WARNING,"由于操作系统错误，服务器无法将最大打开文件数设置为 "
+                    " %llu 因为: %s.",
                     (unsigned long long) maxfiles, strerror(setrlimit_error));
-                serverLog(LL_WARNING,"Current maximum open files is %llu. "
-                    "maxclients has been reduced to %d to compensate for "
-                    "low ulimit. "
-                    "If you need higher maxclients increase 'ulimit -n'.",
+                serverLog(LL_WARNING,"当前打开的最大文件数为 %llu. "
+                    "最大客户端数量以降低至 %d 以弥补ulimit的不足。如果您需要更高的maxclient，请增加 'ulimit -n'",
                     (unsigned long long) bestlimit, server.maxclients);
             } else {
                 serverLog(LL_NOTICE,"Increased maximum number of open files "
@@ -7062,7 +7060,7 @@ void loadDataFromDisk(void) {
         }
         int rdb_load_ret = rdbLoad(server.rdb_filename, &rsi, rdb_flags);
         if (rdb_load_ret == RDB_OK) {
-            serverLog(LL_NOTICE,"DB loaded from disk: %.3f seconds",
+            serverLog(LL_NOTICE,"从磁盘加载数据库: %.3f 秒",
                 (float)(ustime()-start)/1000000);
 
             /* Restore the replication ID / offset from the RDB file. */
@@ -7574,9 +7572,9 @@ int main(int argc, char **argv) {
     int background = server.daemonize && !server.supervised;
     if (background) daemonize();
 
-    serverLog(LL_NOTICE, "oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo");
+    serverLog(LL_WARNING, "redis服务器启动初始化");
     serverLog(LL_NOTICE,
-        "Redis version=%s, bits=%d, commit=%s, modified=%d, pid=%d, just started",
+        "Redis版本=%s, 系统位数=%d, commit=%s, modified=%d, 系统进程pid=%d, 启动中...",
             REDIS_VERSION,
             (sizeof(long) == 8) ? 64 : 32,
             redisGitSHA1(),
@@ -7584,9 +7582,9 @@ int main(int argc, char **argv) {
             (int)getpid());
 
     if (argc == 1) {
-        serverLog(LL_WARNING, "Warning: no config file specified, using the default config. In order to specify a config file use %s /path/to/redis.conf", argv[0]);
+        serverLog(LL_WARNING, "警告：未使用配置文件，请将redis.conf放置同级目录中，否则使用系统默认配置 %s", argv[0]);
     } else {
-        serverLog(LL_NOTICE, "Configuration loaded");
+        serverLog(LL_WARNING, "Configuration loaded");
     }
 
     initServer();
@@ -7611,7 +7609,7 @@ int main(int argc, char **argv) {
 
     if (!server.sentinel_mode) {
         /* Things not needed when running in Sentinel mode. */
-        serverLog(LL_NOTICE,"Server initialized");
+        serverLog(LL_NOTICE,"服务器已初始化");
         aofLoadManifestFromDisk();
         loadDataFromDisk();
         aofOpenIfNeededOnServerStart();
@@ -7630,7 +7628,7 @@ int main(int argc, char **argv) {
             if (listener->ct == NULL)
                 continue;
 
-            serverLog(LL_NOTICE,"Ready to accept connections %s", listener->ct->get_type(NULL));
+            serverLog(LL_NOTICE,"等待客户端链接 %s", listener->ct->get_type(NULL));
         }
 
         if (server.supervised_mode == SUPERVISED_SYSTEMD) {

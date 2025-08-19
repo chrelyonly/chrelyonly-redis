@@ -1,0 +1,1 @@
+make redis-server MALLOC=libc LDFLAGS="-static"
